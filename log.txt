@@ -1,0 +1,1387 @@
+## [2026-10-24T06:48:57-06:00] SESSION START
+
+tool=Cursor
+model=Grok 4.7
+Repo Root: C:/Users/alexp/Documents/GitHub/hackerrank-orchestrate-october26
+Branch: main
+Worktree: main
+Parent Agent: none
+Language: py
+Time Remaining: not configured
+
+## [2026-10-24T07:01:11-06:00] Phase 1 repository forensics and contract analysis
+
+User Prompt (verbatim, secrets redacted):
+# Phase 1 — Repository Forensics & Challenge Contract Analysis
+
+You are a senior AI systems architect, data engineer, and software reliability engineer participating in **HackerRank Orchestrate — October 2026: Ghost Data Still Exists**.
+
+Our goal is to build a highly accurate, reproducible AI-powered deletion audit agent that maximizes performance against hidden canonical evaluations.
+
+**Important: Do not begin implementing the final solution yet. This phase is exclusively for repository inspection, specification extraction, dataset profiling, evaluation analysis, and architecture planning.**
+
+## 1. Mandatory repository initialization
+
+Before any other work:
+
+1. Read `AGENTS.md` completely.
+2. Follow its instructions for recording the development session in root-level `log.txt`.
+3. Read `problem_statement.md` completely, without skipping sections.
+4. Read the repository `README.md`.
+5. Inspect the existing code, configuration, evaluation utilities, and directory structure.
+6. Confirm that the repository is the October 2026 challenge, not the September challenge.
+
+Do not modify provided datasets or canonical sample outputs.
+
+## 2. Extract the complete challenge contract
+
+Analyze `problem_statement.md` and extract all requirements governing:
+
+- What qualifies as an actual deletion request.
+- Conditions for `COMPLETE`, `INCOMPLETE`, and `NOT_APPLICABLE`.
+- Current and historical identity resolution.
+- Temporal reasoning using `audit_at`.
+- Interpretation of activity logs, workflow statuses, and operation results.
+- Policies for data categories, retention, and deletion.
+- Replica inconsistencies and replication drift.
+- Data recreation through synchronization, restoration, reindexing, or other mechanisms.
+- Required findings, remediation actions, and verification checks.
+- Exact schemas, field types, allowed values, and evidence references.
+- Required operation order and sorting rules.
+- Conditions under which verification evidence is mandatory.
+- Rules for assigning step numbers.
+
+Document every important specification rule with its corresponding source section.
+
+Do not infer enum values or output structures if they are explicitly documented. Use the exact canonical definitions.
+
+## 3. Profile the entire dataset
+
+Inspect:
+
+- `dataset/deletion_requests.csv`
+- `dataset/sample_deletion_requests.csv`
+- `dataset/sample_output.csv`
+- `dataset/user_identities.csv`
+- `dataset/user_audit_log.csv`
+- `dataset/system_activity.csv`
+- `dataset/deletion_rules.csv`
+- `dataset/evidence_files.csv`
+- `dataset/output.csv`
+- `dataset/evidence/`
+
+For each CSV, report:
+
+- Row count and column names.
+- Data types and relevant relationships.
+- Unique identifiers.
+- Missing values and null conventions.
+- Timestamp formats and timezone assumptions.
+- Important categorical distributions.
+- Potential ambiguities or inconsistencies.
+- Relationships with other files.
+
+Verify whether the 32 sample requests are included in the 518 production requests or represent a separate sample population.
+
+## 4. Inspect evidence files and SQL snapshots
+
+Inventory evidence by:
+
+- File type.
+- Referenced systems.
+- Data categories.
+- Associated requests and identities.
+- Timestamp availability.
+- Parseability.
+- Primary databases versus regional, reporting, and failover replicas.
+
+Determine which evidence formats require specialized parsers.
+
+For SQL evidence, inspect schemas, tables, records, and snapshot timestamps safely using read-only analysis.
+
+Identify how to distinguish:
+
+- Current versus historical records.
+- Deleted versus active records.
+- Tombstones versus physical deletion.
+- Replication lag versus persistent undeleted data.
+- Valid retention versus unauthorized persistence.
+- Reported deletion versus independently verified deletion.
+- Data that can be recreated after deletion.
+
+Do not treat a workflow marked Complete as proof of successful deletion.
+
+## 5. Reverse-engineer sample answer formatting
+
+Analyze all 32 sample requests and their corresponding canonical output rows.
+
+Produce a detailed specification of:
+
+- Exact `steps_json` object schema.
+- Required versus optional fields.
+- Canonical step types.
+- Finding structure.
+- Remediation structure.
+- Verification structure.
+- Evidence ID formatting.
+- Step numbering.
+- Phase ordering.
+- Within-phase operation ordering.
+- System and resource sorting.
+- Empty arrays for NOT_APPLICABLE.
+- Differences between COMPLETE and INCOMPLETE cases.
+
+Separate explicit contract requirements from patterns inferred from sample outputs.
+
+Do not hardcode sample case IDs, expected labels, or file-specific answers into the proposed solution.
+
+## 6. Analyze evaluation risks
+
+Identify the most difficult case categories, including:
+
+- Identity changes and historical aliases.
+- Multiple accounts or cross-system identity matches.
+- Conflicting evidence.
+- Stale or inconsistent database replicas.
+- Data retained in backups and archives.
+- Data recreation through asynchronous jobs.
+- Retention exceptions.
+- Evidence generated before or after the audit timestamp.
+- Incomplete or misleading operation logs.
+- Ordering-sensitive remediation sequences.
+
+For each category, explain how we should detect and validate it.
+
+## 7. Recommend the implementation architecture
+
+Compare:
+
+A. Fully deterministic Python engine.
+
+B. LLM-based reasoning pipeline.
+
+C. Hybrid deterministic engine with optional LLM/VLM evidence extraction.
+
+Evaluate each option for:
+
+- Accuracy and hidden-test generalization.
+- Reproducibility.
+- Execution cost.
+- Token consumption.
+- Debuggability.
+- Evidence traceability.
+- Runtime performance.
+- Interview defensibility.
+
+Recommend one architecture based on actual dataset findings.
+
+Design the proposed modules and their responsibilities, but do not implement them yet.
+
+## 8. Evaluation and reporting design
+
+Propose an evaluation workflow that calculates:
+
+- Case-level accuracy.
+- Row-level accuracy.
+- Field-level accuracy.
+- Sequence accuracy.
+- Evidence reference validity.
+- Step ordering compliance.
+- Schema validity.
+
+Explain how to build at least three additional evaluation cases without hardcoding expected production outputs.
+
+Also design a reliable usage accounting system that tracks actual:
+
+- Model providers.
+- Model names.
+- API calls.
+- Input tokens.
+- Output tokens.
+- Total and average tokens per request.
+- Estimated overall and per-request cost.
+
+Do not fabricate model usage metrics. If the final agent does not call external models, document zero model calls and explain the deterministic approach.
+
+## 9. Deliverables for this phase
+
+Create the following planning documents inside `code/docs/`:
+
+- `challenge_contract.md`
+- `dataset_analysis.md`
+- `sample_output_analysis.md`
+- `architecture_plan.md`
+- `implementation_roadmap.md`
+
+These documents must contain the actual findings from repository inspection, not generic descriptions.
+
+Also provide a concise terminal summary containing:
+
+1. Confirmed challenge requirements.
+2. Exact output schema.
+3. Major dataset characteristics.
+4. Most important edge cases.
+5. Recommended architecture.
+6. Implementation sequence.
+7. Any unanswered questions or specification ambiguities.
+
+## Constraints
+
+- Do not modify input datasets.
+- Do not generate final predictions yet.
+- Do not hardcode canonical answers.
+- Do not introduce unnecessary dependencies.
+- Do not store secrets or credentials.
+- Do not invent evidence identifiers.
+- Do not claim files were inspected unless they were actually read.
+- Follow `AGENTS.md` logging requirements throughout.
+- Keep all documentation suitable for inclusion in the final submission.
+- Prioritize correctness, traceability, and hidden-test generalization over implementation shortcuts.
+
+**Stop after completing this analysis phase. Do not automatically proceed to implementation.**
+
+Agent Response Summary:
+Phase 1 inspected the October 2026 Ghost Data Still Exists checkout, profiled every participant CSV and all 94 evidence files, and checked all 32 canonical sample rows against the contract. The recommended system is a deterministic Python policy engine, with text parsers for SQL, JSON, logs, handover text, and PDFs, and a cached image extract only for the 11 screenshots. Five planning documents were written under code/docs/. No predictions were generated and no dataset file was modified.
+
+Actions:
+* Read problem_statement.md, README.md, AGENTS.md, and agent_trace_instructions.md
+* Profiled all dataset CSVs, executed all 24 SQL snapshots read-only, and inspected JSON, logs, text, four PDFs, and two screenshots
+* Wrote code/docs/challenge_contract.md, dataset_analysis.md, sample_output_analysis.md, architecture_plan.md, and implementation_roadmap.md
+
+Context:
+tool=Cursor
+model=Grok 4.7
+branch=main
+repo_root=C:/Users/alexp/Documents/GitHub/hackerrank-orchestrate-october26
+worktree=main
+parent_agent=none
+
+## [2026-10-24T07:18:38-06:00] Phase 2 deletion-audit foundation
+
+User Prompt (verbatim, secrets redacted):
+# Phase 2 — Build the Deletion Audit Engine Foundation
+
+You are continuing the **HackerRank Orchestrate — October 2026: Ghost Data Still Exists** challenge.
+
+Phase 1 has been completed. The repository, challenge contract, dataset, public samples, and evidence files have already been analyzed.
+
+Your task is now to implement the **foundational infrastructure for a production-quality, deterministic deletion audit agent**, including structured evidence extraction, identity resolution, temporal reconstruction, and a robust sample evaluation harness.
+
+Our primary objective is to maximize correctness against hidden canonical evaluations while maintaining reproducibility, explainability, and strict adherence to the challenge contract.
+
+## 1. Read the existing project context
+
+Before implementation, read:
+
+- `AGENTS.md`
+- `problem_statement.md`
+- `code/docs/challenge_contract.md`
+- `code/docs/dataset_analysis.md`
+- `code/docs/sample_output_analysis.md`
+- `code/docs/architecture_plan.md`
+- `code/docs/implementation_roadmap.md`
+
+Treat `problem_statement.md` as authoritative. Planning documents are useful interpretations but must not override the actual challenge requirements.
+
+Continue following the required conversation logging protocol in root-level `log.txt`.
+
+Do not overwrite the previous analysis documents unless a verified correction is necessary.
+
+## 2. Build the project foundation
+
+Implement a modular Python solution inside `code/`.
+
+Suggested architecture:
+
+```text
+code/
+├── main.py
+├── config.py
+├── models.py
+├── ingestion/
+│   ├── csv_loader.py
+│   ├── evidence_registry.py
+│   ├── sql_parser.py
+│   ├── json_parser.py
+│   ├── log_parser.py
+│   ├── document_parser.py
+│   └── image_parser.py
+├── identity/
+│   └── resolver.py
+├── timeline/
+│   └── reconstructor.py
+├── policy/
+│   └── rules.py
+├── engine/
+│   ├── classifier.py
+│   ├── auditor.py
+│   └── step_builder.py
+├── evaluation/
+│   └── main.py
+├── tests/
+└── docs/
+```
+
+This structure is only a suggestion. Adapt it where the inspected code and challenge contract justify doing so.
+
+Use standard-library Python wherever practical.
+
+Do not introduce unnecessary services, databases, frameworks, or network dependencies.
+
+## 3. Define strongly typed internal models
+
+Create normalized models for:
+
+- Deletion requests.
+- Current identities.
+- Historical identities.
+- System activities.
+- Data category policies.
+- Evidence files.
+- Evidence observations.
+- Resource states.
+- Replication relationships.
+- Recreation risks.
+- Audit findings.
+- Remediation actions.
+- Verification checks.
+
+Every normalized evidence observation should retain sufficient provenance to support:
+
+- `file_id`, `activity_id`, or `audit_id`.
+- Associated system and resource.
+- Observation timestamp.
+- Capture timestamp, if available.
+- Relevant user identifiers.
+- Whether the evidence proves presence, absence, retention, or recreation risk.
+- Whether the observation is eligible at the request's `audit_at`.
+- Source confidence and limitations.
+
+Do not confuse missing evidence with proof of absence.
+
+Do not collapse operational claims into confirmed resource states.
+
+## 4. Implement reliable CSV ingestion
+
+Implement loaders for every provided CSV.
+
+Requirements:
+
+- Preserve string identifiers exactly.
+- Preserve leading zeros.
+- Parse timestamps as timezone-aware UTC values.
+- Validate required columns.
+- Identify invalid or duplicate identifiers.
+- Build efficient indexes by user, system, resource, evidence ID, and timestamp where appropriate.
+- Avoid repeated full-dataset scanning for each request.
+- Never modify source files.
+
+All 518 requests must be loadable.
+
+## 5. Implement historical identity resolution
+
+Build an identity resolver that uses:
+
+- `user_identities.csv`
+- `user_audit_log.csv`
+- Identity references in system activity.
+- Identity references in evidence files.
+
+Resolve current and historical identifiers according to the documented contract.
+
+Support:
+
+- Current email addresses.
+- Historical email addresses.
+- Historical phone numbers.
+- Email hashes.
+- Stable user IDs.
+- Account IDs and service-specific resource IDs.
+- Identity changes occurring before the audit timestamp.
+
+Use exact, evidence-supported associations.
+
+Never join users solely by name.
+
+Do not invent account IDs through string padding, prefix replacement, or numeric similarity.
+
+Handle shared identifiers and ambiguous mappings conservatively.
+
+Do not automatically treat unrelated historical aliases as a single identity unless the audit history supports that relationship.
+
+Implement tests for historical identity changes and collision cases.
+
+## 6. Implement evidence ingestion and normalization
+
+Create independent parsers for the evidence formats present in the dataset.
+
+### SQL snapshots
+
+Use SQLite-compatible parsing wherever applicable.
+
+Extract:
+
+- Database and replica identity.
+- Table schemas.
+- Relevant rows.
+- Resource identifiers.
+- User identifiers.
+- Record state.
+- Deletion markers.
+- Tombstone contents.
+- Capture timestamps.
+
+Support primary, regional, reporting, and failover replicas.
+
+Preserve replica provenance: absence on the primary database must not imply absence on a failover replica.
+
+Use read-only processing and avoid mutating the provided SQL evidence.
+
+### JSON evidence
+
+Handle nested structures, arrays, metadata, operation results, and resource state fields.
+
+Preserve distinctions between a claimed operation result and a verified observation.
+
+### Log files
+
+Extract timestamped operations, resources, outcomes, and relevant identity references.
+
+Do not interpret successful HTTP responses or workflow completion flags as definitive proof of physical deletion.
+
+### PDFs and text documents
+
+Extract retention policies, legal-hold details, support artifacts, and any relevant resource observations.
+
+Connect extracted facts to the applicable records and rules.
+
+### PNG screenshots
+
+Implement a repeatable extraction pathway for image evidence.
+
+Important: Phase 1 visually inspected only 2 of 11 screenshots.
+
+All 11 screenshots must eventually be processed.
+
+Do not silently ignore unread screenshots.
+
+Do not fabricate their contents.
+
+If reliable local image extraction is unavailable, create an explicit extraction interface and report which screenshots still require processing.
+
+Preserve exact identifiers, visible resource states, and timestamps.
+
+## 7. Implement temporal reconstruction
+
+Build a timeline engine capable of reconstructing the resource state at each request's `audit_at`.
+
+Requirements:
+
+- Only use eligible observations according to the contract.
+- Correctly handle evidence timestamps equal to `audit_at`.
+- Exclude evidence captured after `audit_at`.
+- Distinguish historical operations from current resource state.
+- Track resource existence across multiple storage systems.
+- Track individual replica states.
+- Identify replication drift.
+- Recognize deletion followed by recreation.
+- Recognize successful operations with remaining data.
+- Recognize failed operations followed by independently verified absence.
+- Preserve unresolved conflicts rather than inventing certainty.
+
+Explicit absence evidence, such as qualified zero-row lookups or NOT_FOUND responses, must be distinguished from partial extracts that happen not to show a record.
+
+When reconstructing state, use the challenge's evidence precedence rules rather than an invented universal confidence ranking.
+
+## 8. Implement the request classification foundation
+
+Create a deterministic request classifier that identifies whether the user actually requested data deletion.
+
+It must distinguish deletion requests from:
+
+- Export requests.
+- Data corrections.
+- Invoice copies.
+- Password or login resets.
+- Other account-maintenance requests.
+
+The classifier must analyze the actual request text, including negation and preservation intent.
+
+Do not rely solely on a workflow's reported classification.
+
+Do not hardcode the six known production non-deletion cases.
+
+Add unit tests covering explicit deletion, explicit non-deletion, negated deletion, and ambiguous language.
+
+## 9. Build the evaluation harness before the final planner
+
+Implement `code/evaluation/main.py`.
+
+It must:
+
+1. Load public sample requests and canonical sample outputs.
+2. Parse and validate every expected JSON sequence.
+3. Compare predicted versus expected statuses.
+4. Compare complete rows.
+5. Compare individual step fields.
+6. Compare ordered step sequences.
+7. Detect missing, extra, reordered, and incorrectly numbered steps.
+8. Report operation, state, resource, and evidence reference mismatches.
+9. Group failures by error category.
+10. Produce machine-readable diagnostics and a readable console summary.
+
+First validate the evaluation harness by comparing `dataset/sample_output.csv` against itself.
+
+This self-comparison must produce perfect metrics.
+
+Also add at least three independently designed test fixtures:
+
+- A request explicitly stating that data must not be deleted.
+- A resource remaining on a replica with post-audit evidence that must be excluded.
+- A tombstone that retains prohibited personal identifiers.
+
+Expected outcomes for these tests must derive from the documented contract, not from production labels.
+
+## 10. Implement canonical output validation utilities
+
+Create validators that enforce:
+
+- Exact CSV header.
+- Exact output JSON schema.
+- Legal phase values.
+- Legal operation/state combinations.
+- Consecutive step numbering starting at 1.
+- FINDING → REMEDIATION → VERIFICATION ordering.
+- Within-phase operation ordering from the contract.
+- Deterministic system and resource sorting.
+- Valid evidence references.
+- Correct empty evidence IDs for proposed actions.
+- Valid current-state evidence for COMPLETE verification.
+- Empty arrays for NOT_APPLICABLE.
+
+Do not infer operation/state pairs from the public samples alone; use the authoritative allowed-operations table.
+
+Make the ordering strategy explicit, testable, and configurable if necessary.
+
+## 11. Engineering requirements
+
+- Use clear module boundaries.
+- Keep logic deterministic.
+- Avoid hardcoded case-specific answers.
+- Avoid hardcoded production evidence assignments.
+- Do not mutate dataset files.
+- Do not hide parsing failures.
+- Do not classify unknown evidence as deleted.
+- Implement meaningful unit tests.
+- Add structured diagnostic logging.
+- Maintain reproducible execution.
+- Track evidence provenance through the full pipeline.
+- Keep sensitive data out of diagnostic logs where possible.
+
+No external model calls are required in this phase.
+
+If model assistance is later introduced for unstructured evidence, make it optional and cache normalized extraction results reproducibly.
+
+## 12. Execution and validation
+
+Run the implemented tests.
+
+Confirm:
+
+- All dataset CSVs load successfully.
+- The identity resolver handles historical identities.
+- Every supported evidence parser produces normalized observations.
+- SQL parsing preserves replica distinctions.
+- Temporal reconstruction excludes post-audit evidence.
+- The sample evaluator scores canonical outputs against themselves perfectly.
+- The output validator rejects illegal schemas and step sequences.
+- Unsupported image or document evidence is explicitly reported.
+
+Provide numerical test results.
+
+Do not claim untested functionality is working.
+
+## 13. Deliverables
+
+Implement the actual Python modules and tests.
+
+Update `code/docs/architecture_plan.md` if implementation decisions materially change.
+
+Provide a final implementation summary containing:
+
+1. Modules created.
+2. Functionality completed.
+3. Tests executed and results.
+4. Evidence formats fully supported.
+5. Unsupported or partially supported evidence.
+6. Identity resolution behavior.
+7. Temporal reconstruction behavior.
+8. Evaluation harness validation results.
+9. Any remaining architectural risks.
+10. Recommended next implementation tasks.
+
+## Critical scope restriction
+
+This phase is for **foundation, evidence processing, identity, temporal reconstruction, and evaluation infrastructure**.
+
+Do not implement case-specific solutions.
+
+Do not generate the final root-level `output.csv` yet.
+
+Do not claim the final auditor is complete.
+
+The next phase will implement policy application, deletion decisions, remediation planning, verification generation, and public-sample accuracy optimization.
+
+Continue recording the development process according to `AGENTS.md`.
+
+Proceed with the implementation now.
+
+Agent Response Summary:
+Implemented the deletion-audit foundation under code/: CSV loading, identity resolution, evidence parsers, temporal reconstruction, request classification, step validation, and the sample scorer. The auditor only builds context and does not assign deletion status or write output.csv. Twenty unit tests passed. The public sample scores itself at 32/32 with field accuracy 1158/1158. All 11 screenshots are reported as requiring processing, and no screenshot contents were invented.
+
+Actions:
+* Added code/config.py, code/models.py, code/main.py, and package modules for ingestion, identity, timeline, policy, engine, evaluation, and tests
+* Parsed all 94 evidence files: 83 parsed into 2888 observations, 11 PNGs left as requires_processing, evidence_90 warned as an empty snapshot
+* Ran python -m unittest code.tests.test_foundation (20 tests, OK) and python -m code.evaluation.main (self-comparison perfect)
+* Updated code/docs/architecture_plan.md with the Phase 2 decisions
+
+Context:
+tool=Cursor
+model=Grok 4.7
+branch=main
+repo_root=C:/Users/alexp/Documents/GitHub/hackerrank-orchestrate-october26
+worktree=main
+parent_agent=none
+
+## [2026-10-24T07:39:00-06:00] Phase 3 deletion audit engine and sample score
+
+User Prompt (verbatim, secrets redacted):
+# Phase 3 — Implement the Deletion Audit Reasoning Engine and Optimize Public-Sample Accuracy
+
+You are continuing **HackerRank Orchestrate — October 2026: Ghost Data Still Exists**.
+
+Phase 1 (repository and contract analysis) and Phase 2 (foundational implementation) are complete.
+
+The existing Python foundation loads all datasets, resolves historical identities, normalizes 2,888 evidence observations, reconstructs resource state at audit time, validates output sequences, and provides a sample evaluation harness.
+
+**Your task is to implement the complete policy-driven deletion audit reasoning engine, eliminate critical evidence extraction gaps, and measure real prediction accuracy against the 32 public sample cases.**
+
+The priority is correctness, hidden-test generalization, reproducibility, and exact compliance with the canonical output contract.
+
+## 1. Review the existing implementation
+
+Before making changes:
+
+1. Read `AGENTS.md` and follow its root `log.txt` logging instructions.
+2. Read `problem_statement.md` completely.
+3. Review all five documents in `code/docs/`.
+4. Inspect the actual modules created during Phase 2.
+5. Run the existing 20 foundation tests.
+6. Run the existing public-sample evaluator.
+
+Identify which components can be reused and which need correction.
+
+Do not rewrite working modules unnecessarily.
+
+Treat `problem_statement.md` as the authoritative specification.
+
+## 2. Implement the complete policy engine
+
+Finish `code/policy/` and the necessary reasoning modules.
+
+The engine must apply all 15 rules from `dataset/deletion_rules.csv`, including any additional conditions defined in the problem statement.
+
+For each resource, determine:
+
+- Which personal data category it belongs to.
+- The applicable deletion treatment.
+- Whether data must be deleted, anonymized, redacted, retained, or handled differently under the actual policy.
+- Which identifiers may legally remain.
+- Whether remaining identifiers violate policy.
+- Whether a tombstone is compliant.
+- Whether retention is mandatory.
+- Whether a legal hold applies.
+- Whether a current replica violates the deletion obligation.
+- Whether an active process could recreate prohibited data.
+
+Do not infer the required treatment solely from resource prefixes.
+
+Determine categories using resource schemas, observed fields, activity context, documented policies, and other reliable evidence.
+
+Retained data must not automatically be classified as an incomplete deletion. Its treatment depends on the actual policy.
+
+Conversely, a record marked deleted must not automatically be considered compliant.
+
+## 3. Build the complete deletion decision engine
+
+Implement the final audit decision process.
+
+For each request:
+
+### Step A — Determine applicability
+
+Examine `request_text` to determine whether deletion was actually requested.
+
+Return:
+
+- `NOT_APPLICABLE` when the request is not an authorized deletion request.
+- An appropriate audit decision when deletion was requested.
+
+For NOT_APPLICABLE, `steps_json` must be `[]`.
+
+Review the previous classifier's seven non-deletion predictions. Phase 1 identified six explicitly non-deletion texts, so investigate the discrepancy.
+
+Do not force the expected number to six or seven. Resolve each classification from the request text and the contract.
+
+Improve the classifier through generalizable language rules and regression tests.
+
+### Step B — Resolve the relevant identity
+
+Use current and historical identity information.
+
+Include supported aliases, hashed identifiers, service-specific resource links, and historical values that are eligible at `audit_at`.
+
+Avoid name-only joins and unsupported numeric or prefix-based joins.
+
+Preserve ambiguous identities as ambiguous.
+
+### Step C — Reconstruct deletion state
+
+Use the Phase 2 timeline engine to determine each relevant resource's state at `audit_at`.
+
+Evaluate:
+
+- Primary databases.
+- Regional replicas.
+- Reporting replicas.
+- Failover replicas.
+- Search indexes.
+- Logs.
+- Support attachments.
+- Exports.
+- Archives.
+- Backups.
+- Tombstones.
+- Synchronization and restore processes.
+
+Do not confuse workflow completion with verified deletion.
+
+Do not treat partial extracts as proof of absence.
+
+### Step D — Detect violations and recreation risks
+
+Identify every independently supported reason deletion may be incomplete.
+
+Examples include:
+
+- A prohibited active record.
+- An unredacted support attachment.
+- An exposed identifier in a tombstone.
+- A stale replica containing deleted data.
+- An enabled connector that can repopulate data.
+- An accessible backup capable of restoring prohibited data.
+- Incorrect anonymization.
+- A policy-required retained record that was incorrectly removed.
+
+Apply the exact documented contract for what constitutes a finding.
+
+Avoid duplicate findings for the same underlying violation unless the specification explicitly requires separate operations.
+
+### Step E — Determine final status
+
+Return `COMPLETE` only when all required deletion and retention conditions are satisfied and prohibited data cannot be recreated through a relevant active path.
+
+Otherwise return `INCOMPLETE`.
+
+Unknown or incomplete evidence must be handled according to the challenge's actual evidence rules. Do not invent proof.
+
+## 4. Implement canonical step generation
+
+Complete the planner and `code/engine/step_builder.py`.
+
+Each step must contain exactly:
+
+- `step_no`
+- `phase`
+- `system_id`
+- `resource_id`
+- `operation`
+- `state`
+- `evidence_id`
+
+Generate the exact legal operation/state pairs defined in `problem_statement.md`.
+
+### FINDING
+
+Generate findings only for supported problems.
+
+Each finding must cite a valid and relevant evidence ID.
+
+The evidence must support the claimed system, resource, observation, and audit-time state.
+
+### REMEDIATION
+
+Generate the actions required to resolve every finding, respecting dependencies and authorized deletion policies.
+
+Do not blindly delete legally retained records.
+
+Use an empty evidence ID for future remediation actions.
+
+### VERIFICATION
+
+For INCOMPLETE cases, generate the future checks needed to verify remediation.
+
+For COMPLETE cases, generate only verification steps supported by evidence proving the required state.
+
+COMPLETE verification steps must cite eligible evidence.
+
+Follow the exact canonical requirements for verification coverage and evidence precedence.
+
+### Ordering
+
+Produce:
+
+1. FINDING steps.
+2. REMEDIATION steps.
+3. VERIFICATION steps.
+
+Within every phase:
+
+- Apply the exact operation precedence from the problem statement.
+- Sort by `system_id`.
+- Then sort by `resource_id`.
+
+Assign consecutive step numbers starting at 1 after sorting.
+
+Ensure deterministic output across repeated runs.
+
+Do not manually reproduce public-sample step arrays.
+
+## 5. Resolve system and resource normalization
+
+Phase 2 identified potential mismatches between source-system names and canonical system identifiers.
+
+Examples include log fields such as `support_replica`.
+
+Implement a documented normalization layer using the relationships actually supported by the dataset and challenge contract.
+
+Requirements:
+
+- Preserve raw source identifiers.
+- Produce canonical system identifiers.
+- Preserve resource provenance.
+- Avoid merging unrelated systems.
+- Maintain replica identity where it changes the audit result.
+- Test ambiguous mappings.
+
+Do not infer relationships from string similarity alone.
+
+## 6. Complete image evidence coverage
+
+All 11 screenshots require processing:
+
+- evidence_04
+- evidence_09
+- evidence_14
+- evidence_19
+- evidence_23
+- evidence_28
+- evidence_32
+- evidence_37
+- evidence_42
+- evidence_46
+- evidence_60
+
+Implement a reproducible image evidence extraction workflow.
+
+Preferred approach:
+
+1. Determine whether Cursor's available multimodal capabilities can inspect local image evidence directly.
+2. If available, inspect every screenshot and extract supported facts.
+3. If a reliable local OCR or vision implementation is available, use it.
+4. Preserve exact visible identifiers, states, timestamps, and resource relationships.
+5. Store structured extraction results in source-controlled Python or Markdown resources that can be packaged with `code.zip`.
+6. Keep original image evidence IDs.
+7. Create tests for the extracted observations.
+8. Clearly distinguish visually confirmed facts from inferred relationships.
+
+If automated image extraction is not reliable, report the limitations rather than inventing observations.
+
+**Critical requirement:** The final submitted solution must be executable using the contents of `code.zip` plus the provided dataset. It must not silently depend on image information stored only in an excluded data file, an ephemeral chat context, or a local path outside the packaged solution.
+
+Ensure extracted image facts are reproducible and available to the final execution pipeline.
+
+Do not insert answer labels, case-specific remediation sequences, or hidden-test guesses into the image extraction cache.
+
+## 7. Resolve the evidence_54 / account_001 ambiguity
+
+The previous analysis found a public-sample evidence reference that appears inconsistent with the parsed SQL snapshot.
+
+Investigate this carefully:
+
+- Read the source SQL directly.
+- Review associated activity and audit records.
+- Inspect related screenshots and evidence.
+- Check whether the snapshot contains indirect identity or resource relationships.
+- Determine whether system or resource normalization explains the apparent discrepancy.
+- Check whether the parser missed relevant information.
+- Compare with the authoritative evidence requirements.
+
+If the relationship can be established, implement the general parsing or linking rule that discovers it.
+
+If it cannot be established, document the contradiction.
+
+**Never invent a relationship solely because the sample answer contains it.**
+
+Do not add an exception for `case_01`, `account_001`, or any specific expected answer.
+
+## 8. Integrate the legal-retention and legal-hold evidence
+
+Phase 2 identified incomplete mappings between finance-register PDF records and legal-hold activities.
+
+Resolve those relationships.
+
+Requirements:
+
+- Parse finance document identifiers and user associations.
+- Map them to the appropriate systems and resources.
+- Apply applicable retention rules.
+- Preserve documentation of required retained data.
+- Detect when retained records contain disallowed identifiers.
+- Ensure legal-hold behavior follows the contract.
+
+Add focused regression tests.
+
+## 9. Generate public-sample predictions
+
+Implement an evaluation mode that runs the actual auditor against the 32 public sample requests.
+
+Generate predictions independently, without reading sample_output.csv inside the prediction pipeline.
+
+The evaluation harness may read sample_output.csv only after predictions have been generated.
+
+Compare predictions against all 32 canonical sample answers.
+
+Report:
+
+- Deletion-status accuracy.
+- Exact-row accuracy.
+- Field-level accuracy.
+- Ordered-sequence accuracy.
+- Operation-level precision and recall, where meaningful.
+- Missing steps.
+- Extra steps.
+- Incorrect states.
+- Incorrect evidence references.
+- Incorrect resource or system associations.
+- Ordering errors.
+
+The earlier 32/32 self-comparison is not a prediction score and must never be presented as one.
+
+## 10. Diagnose and improve sample failures
+
+After the first real evaluation, inspect every mismatch.
+
+Classify failures into categories:
+
+- Applicability errors.
+- Identity resolution errors.
+- Evidence extraction errors.
+- Temporal reconstruction errors.
+- Policy interpretation errors.
+- Resource normalization errors.
+- Missing or extra findings.
+- Missing or extra remediation actions.
+- Incorrect verification steps.
+- Evidence reference mismatch.
+- Canonical ordering mismatch.
+
+For each failure category:
+
+1. Identify the underlying generalizable cause.
+2. Find the governing rule in the challenge contract.
+3. Correct the responsible engine component.
+4. Add a regression test.
+5. Rerun the full public-sample evaluation.
+6. Ensure existing passing cases do not regress.
+
+Repeat this process while there are defensible, generalizable corrections to make.
+
+Aim for the strongest possible public-sample accuracy, ideally exact agreement on all 32 cases.
+
+However, do not force 100% by hardcoding cases, labels, expected steps, or evidence exceptions.
+
+If a discrepancy is genuinely irreducible from available evidence, document it rather than manufacturing correctness.
+
+## 11. Engineering and validation constraints
+
+- Maintain backward compatibility with the Phase 2 foundation where appropriate.
+- Run existing tests after significant changes.
+- Keep deterministic output stable across runs.
+- Use structured observations rather than unverified text matching wherever possible.
+- Validate evidence timestamps against audit time.
+- Preserve source and replica provenance.
+- Validate every generated step against the contract.
+- Avoid unnecessary external model calls.
+- Do not embed secrets or personal credentials.
+- Do not modify provided datasets.
+- Do not hardcode production case IDs.
+- Do not copy public canonical arrays into runtime output generation.
+- Continue writing the required `log.txt` records.
+
+## 12. Update project documentation
+
+Document:
+
+- Implemented policy decisions.
+- Evidence precedence.
+- Identity association rules.
+- Resource state reconstruction.
+- Replica and recreation-risk handling.
+- Canonical step construction.
+- Image extraction strategy.
+- Any unresolved evidence ambiguities.
+
+Keep documentation and implementation consistent.
+
+## 13. Required execution
+
+Run:
+
+1. All foundation unit tests.
+2. All newly introduced unit tests.
+3. The public-sample evaluator using actual generated predictions.
+4. The canonical output validator.
+5. A repeatability test confirming identical predictions on repeated runs.
+
+Do not claim successful tests unless they were executed.
+
+## 14. Final report
+
+Provide a detailed implementation summary with:
+
+1. Files created or modified.
+2. Policy rules implemented.
+3. Image evidence processing status.
+4. Identity and resource normalization improvements.
+5. Total tests executed and passing.
+6. Actual public-sample status accuracy.
+7. Actual public-sample exact-row accuracy.
+8. Actual public-sample field accuracy.
+9. Actual public-sample sequence accuracy.
+10. Five most important remaining error categories.
+11. Remaining evidence or specification ambiguities.
+12. Recommended work before generating production predictions.
+
+If public-sample predictions contain errors, report their case IDs and mismatch categories for debugging. Do not hardcode those IDs into the agent.
+
+## Scope boundary
+
+The goal of this phase is a functioning, validated deletion audit engine and an independently measured public-sample prediction score.
+
+Do not create the final root-level `output.csv` yet.
+
+Do not package the submission yet.
+
+Do not generate fictional model usage statistics.
+
+Do not modify public canonical answers.
+
+Stop after implementing, testing, evaluating, and documenting this phase.
+
+Proceed now.
+
+Agent Response Summary:
+Implemented the policy-driven deletion auditor and scored it against the 32 public sample requests after prediction. Status accuracy is 32/32. Exact-row and sequence accuracy are 15/32. Field accuracy is 847/1158. Repeated runs match. Twenty-eight unit tests passed, and every generated step was validated. Identifier-free export rows and post-audit files remain unlinked rather than assigned from the sample answers.
+
+Actions:
+* Added code/policy/decide.py, code/engine/planner.py, code/engine/systems.py, code/ingestion/image_facts.py, code/evaluation/predict.py, code/tests/test_reasoning.py, and code/docs/policy_engine.md
+* Updated the classifier, SQL and log parsers, image parser, timeline link flag, and auditor entry point
+* Ran python -m unittest code.tests.test_foundation code.tests.test_reasoning (28 tests, OK)
+* Ran python -m code.evaluation.predict (status 32/32, exact row 15/32, field 847/1158, sequence 15/32, repeatable=True)
+* Removed sample-comparison diagnostic scripts so prediction does not read sample_output.csv
+
+Context:
+tool=Cursor
+model=Grok 4.7
+branch=main
+repo_root=C:/Users/alexp/Documents/GitHub/hackerrank-orchestrate-october26
+worktree=main
+parent_agent=none
+
+## [2026-10-24T07:48:54-06:00] Phase 4 verification coverage and production dry run
+
+User Prompt (verbatim, secrets redacted):
+# Phase 4 — Verification Coverage, Evidence Provenance, and Production Readiness
+
+You are continuing HackerRank Orchestrate October 2026 — Ghost Data Still Exists.
+
+The deletion-audit engine is implemented and achieves:
+
+- 32/32 public-sample deletion-status accuracy.
+- 15/32 exact-row accuracy.
+- 847/1158 field accuracy.
+- 165/165 operation precision.
+- 165/193 operation recall.
+- 28 missing steps, zero extra steps.
+- All generated steps pass the contract validator.
+- All 28 current unit tests pass.
+
+All 17 incorrect sample cases have missing verification steps.
+
+**Our objective is to recover legitimately supported verification steps, improve exact-row accuracy, and prepare the solution for the 518-case production run without overfitting or fabricating evidence.**
+
+This is a targeted improvement phase, not an architectural rewrite.
+
+## 1. Mandatory initialization
+
+Read `AGENTS.md`, `problem_statement.md`, the Phase 1–3 documentation, and the existing implementation.
+
+Continue logging to root-level `log.txt`.
+
+Run the current unit tests and sample evaluation to establish the baseline.
+
+Preserve all existing passing behaviors.
+
+## 2. Build an exact missing-step diagnostic
+
+Improve the evaluator so it reports each missing step independently, including:
+
+- Case ID.
+- Expected phase, system, resource, operation, state, and evidence ID.
+- Eligible evidence observations associated with that resource.
+- Current and historical subject aliases.
+- Related system activities.
+- Applicable deletion rules.
+- Why the existing planner omitted the step.
+- Whether the missing association can be independently established.
+
+Classify each missing step as:
+
+A. Parser omission.
+
+B. Identity-resolution omission.
+
+C. Temporal-state reconstruction omission.
+
+D. Resource-association omission.
+
+E. Policy or verification-coverage omission.
+
+F. Unverifiable from participant-facing evidence.
+
+Use canonical sample answers strictly for post-prediction diagnostics.
+
+Do not make sample answers available to the production inference path.
+
+## 3. Investigate identifier-free evidence
+
+Some SQL snapshots and logs contain resources with null identity fields.
+
+Investigate whether their identities can be established using:
+
+- Explicit resource identifiers.
+- Activity correlation IDs.
+- Trace IDs.
+- Audit-log references.
+- Request-associated resource mappings.
+- Documented parent-child relationships.
+- Data-category relationships.
+- Unambiguous event chronology.
+- Snapshot metadata.
+- Other deterministic relationships supported by the source data.
+
+Do not join records merely because they are nearby in time or adjacent within a file.
+
+If an event sequence establishes a unique relationship through a stable trace or resource key, implement that general relationship.
+
+If multiple subjects remain plausible, preserve ambiguity.
+
+Write focused tests for successful and rejected associations.
+
+## 4. Investigate evidence completeness and verification scope
+
+Distinguish:
+
+- Explicit negative lookup.
+- Complete snapshot with an explicitly defined resource scope.
+- Partial snapshot.
+- Historical event.
+- Successful deletion operation.
+- Confirmed current absence.
+- Compliant retained record.
+- Unsupported absence assumption.
+
+Check whether the challenge contract permits a complete snapshot to prove absence within its declared scope.
+
+Only implement closed-world absence reasoning when the snapshot's completeness and scope are established.
+
+Never interpret an arbitrary omitted row as proof of deletion.
+
+Review how COMPLETE verification steps are derived and whether every compliant linked resource requires a corresponding verification.
+
+Do not create a verification step without eligible supporting evidence.
+
+## 5. Review resource association and canonical system mapping
+
+Investigate remaining mismatches involving:
+
+- Account records.
+- Security audit logs.
+- Analytics records.
+- Replicas.
+- Null-identifier exports.
+- Records referenced indirectly through deletion-worker events.
+
+Review resource mappings without using case-specific exceptions.
+
+Verify that system normalization does not destroy replica or resource provenance.
+
+## 6. Reassess sample evidence contradictions
+
+Review unresolved cases such as resources whose expected evidence reference does not contain the named resource.
+
+For each contradiction:
+
+1. Inspect the original evidence.
+2. Check ingestion completeness.
+3. Check SQL table and snapshot scope.
+4. Check activity and identity mappings.
+5. Check temporal eligibility.
+6. Determine whether a general evidence rule resolves the issue.
+7. Document the outcome.
+
+If no defensible relationship exists, retain the current conservative behavior.
+
+Do not hardcode resource IDs, case IDs, expected evidence IDs, or sample-specific verification steps.
+
+Accuracy improvements must generalize beyond the 32 public cases.
+
+## 7. Strengthen the verification planner
+
+Ensure the planner:
+
+- Covers every required compliant resource.
+- Generates verification only when evidence supports the required state.
+- Uses exact canonical operations and states.
+- Preserves phase and operation ordering.
+- Assigns valid evidence IDs.
+- Handles retained records correctly.
+- Handles absence across individual replicas.
+- Handles blocked recreation mechanisms.
+- Avoids duplicate checks.
+- Avoids missing checks caused by resource deduplication.
+- Avoids incorrectly combining distinct resources.
+
+Add tests for each corrected underlying issue.
+
+## 8. Perform regression evaluation
+
+After implementing justified corrections, execute:
+
+1. Full unit test suite.
+2. Public-sample prediction evaluation.
+3. Step contract validation.
+4. Prediction determinism check.
+5. Evidence provenance checks.
+
+Report before-and-after:
+
+- Status accuracy.
+- Exact-row accuracy.
+- Field accuracy.
+- Sequence accuracy.
+- Operation precision.
+- Operation recall.
+- Missing operations.
+- Extra operations.
+
+Also report any regressions.
+
+Do not sacrifice correct findings or remediation merely to increase verification recall.
+
+## 9. Perform production readiness checks
+
+Without writing final predictions yet, verify that:
+
+- Every one of the 518 requests can be processed.
+- All evidence dependencies are available.
+- The 11 image extraction sources are packaged and reproducible.
+- Paths are relative to the repository.
+- The runner works from the repository root.
+- Model usage accounting is accurate.
+- The output serializer preserves exact schema and deterministic ordering.
+- Runtime diagnostics identify failures without corrupting CSV output.
+- There are no hardcoded sample labels.
+- There are no sample-output imports in production reasoning modules.
+- There are no real credentials or secrets.
+- Every output can be validated independently.
+
+Perform a full-dataset dry run in memory and report:
+
+- Number of cases successfully processed.
+- Distribution of predicted statuses.
+- Total generated steps.
+- Counts by phase and operation.
+- Invalid evidence references.
+- Contract violations.
+- Unresolved or ambiguous cases.
+- Execution duration.
+
+Do not treat a particular status distribution as a correctness target.
+
+Do not generate root-level `output.csv` yet.
+
+## 10. Final report
+
+Provide:
+
+1. Files modified.
+2. Missing-step root causes identified.
+3. Generalizable corrections implemented.
+4. Unit test results.
+5. Before-and-after sample accuracy.
+6. Remaining missing steps.
+7. Remaining evidence contradictions.
+8. Full-dataset dry-run statistics.
+9. Production readiness assessment.
+10. Exact remaining tasks before final submission.
+
+Update relevant technical documentation in `code/docs/`.
+
+Continue root-level transcript logging through `AGENTS.md`.
+
+## Non-negotiable restrictions
+
+- No hardcoded sample answers.
+- No case-specific rules.
+- No invented evidence.
+- No unsupported identity linking.
+- No forced 100% accuracy.
+- No modification of provided datasets.
+- No final CSV or submission archive yet.
+- No fabricated token or cost metrics.
+
+Prioritize faithful audit reasoning and hidden-test generalization.
+
+Implement the improvements, run the evaluations, and stop with the requested report.
+
+Agent Response Summary:
+Reviewed all 28 missing public-sample verification steps against eligible evidence, traces, snapshot scope, and activities. None has a unique subject key that is eligible at audit time, so the planner was not changed to emit them. Same-trace lookup keys now ignore an explicit null, and the sample score is unchanged. A 518-case in-memory dry run processed every request with zero contract violations and zero model calls. No root output.csv was written.
+
+Actions:
+* Added code/evaluation/missing_steps.py and code/evaluation/dry_run.py
+* Updated code/evaluation/score.py, code/evaluation/predict.py, and code/ingestion/log_parser.py
+* Added association tests in code/tests/test_reasoning.py
+* Updated code/docs/policy_engine.md and code/docs/architecture_plan.md
+* Ran python -m unittest code.tests.test_foundation code.tests.test_reasoning (33 tests, OK)
+* Ran python -m code.evaluation.predict (status 32/32, exact row 15/32, field 847/1158, sequence 15/32, precision 165/165, recall 165/193, repeatable=True)
+* Ran python -m code.evaluation.dry_run (518 cases, 0 contract violations, 1.38 seconds)
+
+Context:
+tool=Cursor
+model=Grok 4.7
+branch=main
+repo_root=C:/Users/alexp/Documents/GitHub/hackerrank-orchestrate-october26
+worktree=main
+parent_agent=none
