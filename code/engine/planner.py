@@ -93,6 +93,7 @@ class DeletionPlanner:
             )
         }
         linked.update(anchored)
+        linked.update(_historical_lineage(aliases, self.observations, request.audit_at))
         selected = [
             row
             for row in self.observations
@@ -104,6 +105,12 @@ class DeletionPlanner:
         ]
         selected.extend(_account_omissions(anchored, request, self.observations))
         states = _collapse(self.timeline.reconstruct(selected, request.audit_at))
+        gap_rows = _historical_state_gaps(linked, request, self.observations, selected)
+        gap_states = [
+            state
+            for state in _collapse(self.timeline.reconstruct(gap_rows, request.audit_at, require_package=False))
+            if state.resource_id not in {item.resource_id for item in states}
+        ]
         treatments: list[tuple[ResourceState, Treatment]] = []
         for state in states:
             treatment = decide(state, request.audit_at)
@@ -113,8 +120,64 @@ class DeletionPlanner:
         status = "INCOMPLETE" if violations or not treatments else "COMPLETE"
         if any(state.presence == "conflict" for state, _treatment in treatments):
             status = "INCOMPLETE"
-        steps = _steps(treatments, evidence_for_compliant=status == "COMPLETE")
+        if status == "INCOMPLETE":
+            for state in gap_states:
+                treatment = decide(state, request.audit_at)
+                if treatment is not None and treatment.compliant:
+                    treatments.append((state, treatment))
+        steps = _steps(treatments, evidence_for_compliant=status == "COMPLETE", audit_at=request.audit_at)
         return AuditDecision(request.case_id, status, steps)
+
+
+def _historical_lineage(aliases, observations: list[Observation], audit_at: datetime) -> set[str]:
+    """Resource ids owned by this subject in a snapshot or event at or before audit_at.
+
+    The file that carries the identity may have been packaged later. Those rows
+    are not state. A resource claimed by another subject's identifiers is left
+    unresolved.
+    """
+    grouped: dict[str, list[Observation]] = {}
+    for row in observations:
+        if row.is_claim or not row.resource_id or row.identifiers.is_empty():
+            continue
+        moment = row.observed_at or row.captured_at
+        if moment is None or moment > audit_at:
+            continue
+        grouped.setdefault(row.resource_id, []).append(row)
+    owned: set[str] = set()
+    for resource_id, rows in grouped.items():
+        matched = [row for row in rows if aliases.intersects(row.identifiers)]
+        competing = [row for row in rows if not aliases.intersects(row.identifiers)]
+        if matched and not competing:
+            owned.add(resource_id)
+    return owned
+
+
+def _historical_state_gaps(
+    linked: set[str],
+    request: DeletionRequest,
+    observations: list[Observation],
+    selected: list[Observation],
+) -> list[Observation]:
+    """State rows whose event is before the audit but whose package is later.
+
+    They fill a resource that has no eligible observation. They never replace one.
+    """
+    covered = {row.resource_id for row in selected if row.resource_id}
+    gaps: list[Observation] = []
+    for row in observations:
+        if row.is_claim or not row.resource_id or row.resource_id not in linked:
+            continue
+        if row.resource_id in covered:
+            continue
+        if row.observed_at is None or row.observed_at > request.audit_at:
+            continue
+        if row.captured_at is not None and row.captured_at <= request.audit_at:
+            continue
+        if _stale_absence(row, request.requested_at):
+            continue
+        gaps.append(row)
+    return gaps
 
 
 def _stale_absence(row: Observation, requested_at: datetime) -> bool:
@@ -125,10 +188,28 @@ def _stale_absence(row: Observation, requested_at: datetime) -> bool:
     return moment is not None and moment < requested_at
 
 
-def _anchored_resources(request, activities, observations, aliases) -> set[str]:
+@dataclass(frozen=True)
+class ResourceScope:
+    """A resource placed in deletion scope by evidence, not by time proximity."""
+
+    system_id: str
+    resource_id: str
+    subject_id: str | None
+    subject_source: str
+    workflow_source: str
+    competing: bool
+
+
+def resource_scopes(request, activities, observations, aliases) -> list[ResourceScope]:
+    """Workflow scope is the literal target named by a deletion worker.
+
+    Activity details have no case, user, trace, or correlation id. A worker row
+    that does not name its target stays out of scope, including inside the
+    ten-minute window around reported_at.
+    """
     start = request.reported_at - ANCHOR_WINDOW
     end = request.reported_at + ANCHOR_WINDOW
-    found: set[str] = set()
+    scopes: list[ResourceScope] = []
     for activity in activities:
         if activity.source_system != "deletion_worker" or activity.event_type not in ANCHOR_EVENTS:
             continue
@@ -136,10 +217,26 @@ def _anchored_resources(request, activities, observations, aliases) -> set[str]:
             continue
         if activity.event_time < start or activity.event_time > end or activity.event_time > request.audit_at:
             continue
-        if _belongs_to_other(activity.resource_id, observations, aliases, request.audit_at):
-            continue
-        found.add(activity.resource_id)
-    return found
+        competing = _belongs_to_other(activity.resource_id, observations, aliases, request.audit_at)
+        scopes.append(
+            ResourceScope(
+                system_id=activity.target_system or "",
+                resource_id=activity.resource_id,
+                subject_id=None,
+                subject_source="named_target_only",
+                workflow_source=activity.activity_id,
+                competing=competing,
+            )
+        )
+    return scopes
+
+
+def _anchored_resources(request, activities, observations, aliases) -> set[str]:
+    return {
+        scope.resource_id
+        for scope in resource_scopes(request, activities, observations, aliases)
+        if not scope.competing
+    }
 
 
 def _belongs_to_other(resource_id: str, observations, aliases, audit_at) -> bool:
@@ -247,12 +344,20 @@ def _collapse(states: list[ResourceState]) -> list[ResourceState]:
     return chosen
 
 
-def _steps(treatments: list[tuple[ResourceState, Treatment]], *, evidence_for_compliant: bool) -> list[AuditStep]:
+def _steps(
+    treatments: list[tuple[ResourceState, Treatment]],
+    *,
+    evidence_for_compliant: bool,
+    audit_at: datetime,
+) -> list[AuditStep]:
     steps: list[AuditStep] = []
     for state, treatment in treatments:
         if state.evidence_id is None:
             continue
+        packaged_later = state.captured_at is not None and state.captured_at > audit_at
         if treatment.finding_operation and treatment.remediation_operation:
+            if packaged_later:
+                continue
             steps.append(
                 finding(
                     system_id=state.system_id,
@@ -276,6 +381,8 @@ def _steps(treatments: list[tuple[ResourceState, Treatment]], *, evidence_for_co
                     evidence_id="",
                 )
             )
+            continue
+        if packaged_later and evidence_for_compliant:
             continue
         evidence_id = state.evidence_id if evidence_for_compliant else ""
         steps.append(

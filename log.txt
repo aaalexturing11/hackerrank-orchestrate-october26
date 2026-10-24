@@ -1385,3 +1385,134 @@ branch=main
 repo_root=C:/Users/alexp/Documents/GitHub/hackerrank-orchestrate-october26
 worktree=main
 parent_agent=none
+
+## [2026-10-24T08:13:18-06:00] Phase 5 exact-match investigation
+
+User Prompt (verbatim, secrets redacted):
+# Phase 5 — Deep Forensics, Canonical Semantics Reconstruction & 100% Exact-Match Optimization
+
+You are continuing **HackerRank Orchestrate — October 2026: Ghost Data Still Exists**.
+
+We have completed four development phases and built a working deletion audit agent.
+
+However, the current implementation is not yet satisfactory. Although it achieves perfect deletion-status accuracy on public samples, it reproduces only 15 of 32 canonical output rows exactly.
+
+**The primary objective of this phase is to achieve 32/32 exact-row accuracy, 100% field accuracy, 100% sequence accuracy, and full operation recall on the public samples, while preserving hidden-test generalization.**
+
+Do not package the submission or generate the final root-level output.csv during this phase.
+
+We are deliberately prioritizing accuracy optimization before finalization.
+
+---
+
+## 1. Current baseline
+
+The latest validated results are:
+
+| Metric | Value |
+|---|---|
+| Status accuracy | 32/32 |
+| Exact-row accuracy | 15/32 |
+| Field accuracy | 847/1158 |
+| Sequence accuracy | 15/32 |
+| Operation precision | 165/165 |
+| Operation recall | 165/193 |
+| Missing steps | 28 |
+| Extra steps | 0 |
+| Contract validation | 100% |
+| Unit tests | 33 passed |
+| Production dry run | 518/518 processed |
+
+All 28 missing operations are verification steps.
+
+The previous investigation classified the missing operations as:
+
+- 11 identity-resolution omissions.
+- 6 temporal omissions.
+- 7 resource-association omissions.
+- 4 apparently unverifiable references.
+
+The prior implementation refused to generate these steps because it could not establish independently supported subject-resource associations.
+
+**This phase must investigate whether that conclusion is caused by an overly restrictive interpretation of the challenge's evidence semantics, insufficient cross-source correlation, incomplete temporal reasoning, or incorrect reconstruction of the canonical verification requirements.**
+
+Do not simply repeat the previous analysis.
+
+Challenge its assumptions using new investigative methods.
+
+The remainder of the brief required sections 2 through 17: reread the contract and docs, save a baseline, write code/docs/exact_match_investigation.md, reconstruct verification semantics, build a relationship graph, reevaluate timestamps, inspect identifier-free raw files, compare all 32 sample rows, recheck evidence_54 and evidence_51, add a development-only evidence chain, implement only generalizable corrections, reject unsafe rules, add synthetic regressions, add alignment-aware diagnostics without replacing the positional metric, target 32/32 exact rows without hardcoding, rerun tests and the 518-case dry run, and report accuracy, discoveries, remaining mismatches, generalization, tests, readiness, and a recommendation. It forbade dataset edits, hardcoded case answers, invented evidence, later-evidence shortcuts, root output.csv, and code.zip.
+
+Agent Response Summary:
+Re-opened the 28 missing verifications from raw snapshots and logs. The identifying copies sit in files packaged after audit_at. Treating inner event time as eligibility dropped exact-row accuracy from 15/32 to 12/32 and status accuracy from 32/32 to 30/32, so that rule was reverted. The restored auditor again scores 15/32 exact rows, 847/1158 positional fields, and 990/1158 aligned fields, with 28 missing operations and zero extras. The 518-case dry run still validates every row. No root output.csv was written.
+
+Actions:
+* Added code/docs/exact_match_investigation.md
+* Added an alignment diagnostic in code/evaluation/score.py that does not replace positional field accuracy
+* Added a regression test that a later evidence package does not make an earlier event eligible
+* Ran the event-time experiment, recorded the regression, and restored the package-time rule
+* Ran python -m unittest code.tests.test_foundation code.tests.test_reasoning (34 tests, OK)
+* Ran python -m code.evaluation.predict (status 32/32, exact row 15/32, field 847/1158, aligned field 990/1158, sequence 15/32, precision 165/165, recall 165/193, repeatable=True)
+* Ran python -m code.evaluation.dry_run (518 cases, 0 contract violations, 1.39 seconds)
+
+Context:
+tool=Cursor
+model=Grok 4.7
+branch=main
+repo_root=C:/Users/alexp/Documents/GitHub/hackerrank-orchestrate-october26
+worktree=main
+parent_agent=none
+
+## [2026-10-24T13:29:42-06:00] Phase 6 bitemporal lineage and state
+
+User Prompt (verbatim, secrets redacted):
+# Phase 6 — Root-Cause Recovery: Bitemporal Evidence, Identity Lineage, and Canonical Exact-Match Optimization
+
+Continue Ghost Data Still Exists. Reach 32/32 exact public-sample rows with generalizable rules, while remaining correct for all 518 production requests. Do not repeat the global eligibility change that treated inner event timestamps as sufficient for both identity and state. Separate historical identity, deletion scope, audit-time state, and citation admissibility. Run experiments A through E in order, measure each, and keep only changes that pass the safety gates. Implement python code/main.py so it writes root output.csv for all 518 requests through the same auditor. Check decide() against all 15 deletion rules. Write code/docs/bitemporal_evidence_analysis.md and code/docs/verification_recovery_report.md. Do not package code.zip.
+
+Agent Response Summary:
+Kept package time as the gate for state and citations. A later package may supply ownership when its inner timestamp is at or before the audit, and it may supply state only when that resource has no eligible observation and the case is already incomplete. That recovered 7 verifications, raised exact rows from 15/32 to 17/32, and left precision at 172/172 with zero extra steps. Workflow correlation could not replace the named-target anchor because activity rows have no shared subject or correlation id. Snapshot absence and replica merge were measured and left unchanged. python code/main.py wrote 518 valid rows. The remaining 21 sample operations have null identifiers, no subject on the activity, or no participant-facing source.
+
+Actions:
+* Updated code/engine/planner.py with historical lineage, gap state, and ResourceScope
+* Updated code/timeline/reconstructor.py so gap reconstruction can keep an already filtered event
+* Updated code/main.py to write repository-root output.csv
+* Added synthetic tests in code/tests/test_reasoning.py (41 tests passing)
+* Wrote code/docs/bitemporal_evidence_analysis.md and code/docs/verification_recovery_report.md
+* Ran python -m code.evaluation.predict (status 32/32, exact 17/32, field 889/1158, sequence 17/32, precision 172/172, recall 172/193, missing 21, extra 0, repeatable)
+* Ran python code/main.py (518 rows, COMPLETE 162, INCOMPLETE 349, NOT_APPLICABLE 7, contract violations 0)
+
+Context:
+tool=Cursor
+model=Grok 4.7
+branch=main
+repo_root=C:/Users/alexp/Documents/GitHub/hackerrank-orchestrate-october26
+worktree=main
+parent_agent=none
+
+## [2026-10-24T13:40:09-06:00] Phase 7 submission package
+
+User Prompt (verbatim, secrets redacted):
+# Phase 7 — Final Accuracy Investigation, Reliability Audit & Competition Submission
+
+Complete Ghost Data Still Exists. Keep the 17/32 baseline unless a new evidence-supported rule is uniquely recoverable. Re-check the 21 missing operations and the seven recovered verifications. Audit policy and temporal behavior. If nothing generalizable remains, stop optimizing. Run python code/main.py twice and compare SHA-256 hashes. Write code/evaluation/evaluation_report.md, code/evaluation/usage_report.md, and code/docs/ai_judge_preparation.md. Update README.md. Build code.zip without dataset, caches, secrets, or nested archives. Extract it and regenerate output.csv against the original dataset. Confirm log.txt. Do not claim the files were uploaded.
+
+Agent Response Summary:
+A fresh scan of the evidence files found no unique admissible owner for the 21 missing operations. account_3866 is named only in a snapshot dated after the audit, so that link was not used. The 17/32 auditor was left in place. Production was run twice with identical SHA-256 hashes, the evaluation and usage reports were written with zero runtime model calls, and code.zip regenerated the same output.csv from a clean extract.
+
+Actions:
+* Scanned participant evidence for the 21 unresolved resource ids and did not change inference
+* Updated code/config.py so the dataset root is found beside code/main.py
+* Wrote code/evaluation/evaluation_report.md, code/evaluation/usage_report.md, and code/docs/ai_judge_preparation.md
+* Updated README.md with architecture, run, evaluation, and limitation notes
+* Ran python -m unittest code.tests.test_foundation code.tests.test_reasoning (41 tests, OK)
+* Ran python -m code.evaluation.predict (status 32/32, exact 17/32, field 889/1158, sequence 17/32, precision 172/172, recall 172/193, missing 21, extra 0, repeatable)
+* Ran python code/main.py twice (SHA-256 945dc6236c87f29551f47a923de381f58c7991825b2f84bea09ca427adcffad5 both times; 518 rows; 0 contract violations)
+* Built code.zip (51 entries) and regenerated output.csv from a clean extract with the same hash
+
+Context:
+tool=Cursor
+model=Grok 4.7
+branch=main
+repo_root=C:/Users/alexp/Documents/GitHub/hackerrank-orchestrate-october26
+worktree=main
+parent_agent=none

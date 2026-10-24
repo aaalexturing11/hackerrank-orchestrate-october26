@@ -39,9 +39,15 @@ KNOWN_SYSTEMS = frozenset(
 
 
 def repo_root() -> Path:
+    """Directory that contains this solution and the participant dataset.
+
+    A clean unpack of code.zip next to dataset/ works without a machine-specific path.
+    """
     here = Path(__file__).resolve()
     for candidate in here.parents:
-        if (candidate / "AGENTS.md").is_file() and (candidate / "dataset").is_dir():
+        has_dataset = (candidate / "dataset").is_dir()
+        has_entry = (candidate / "code" / "main.py").is_file()
+        if has_dataset and has_entry:
             return candidate
     raise RuntimeError("Could not locate the repository root from code/config.py")
 

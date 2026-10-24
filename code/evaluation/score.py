@@ -37,6 +37,8 @@ class ScoreReport:
     operation_overlap: int = 0
     operation_expected: int = 0
     operation_predicted: int = 0
+    aligned_field_matches: int = 0
+    aligned_field_total: int = 0
     failures: list[CaseFailure] = field(default_factory=list)
     field_mismatches: list[FieldMismatch] = field(default_factory=list)
 
@@ -63,6 +65,10 @@ class ScoreReport:
     @property
     def operation_recall(self) -> float:
         return _ratio(self.operation_overlap, self.operation_expected)
+
+    @property
+    def aligned_field_accuracy(self) -> float:
+        return _ratio(self.aligned_field_matches, self.aligned_field_total)
 
     def grouped(self) -> dict[str, int]:
         counts: dict[str, int] = {}
@@ -135,6 +141,7 @@ def _score_case(report: ScoreReport, case_id: str, expected: dict[str, str], pre
         elif len(predicted_steps) > len(expected_steps):
             report.failures.append(CaseFailure(case_id, "extra_step", f"extra {len(predicted_steps) - len(expected_steps)} step(s)"))
     _score_fields(report, case_id, expected_steps, predicted_steps)
+    _score_aligned_fields(report, expected_steps, predicted_steps)
     if status_ok and expected_seq == predicted_seq:
         report.exact_rows += 1
 
@@ -168,12 +175,34 @@ def _score_fields(
                 )
 
 
+def _score_aligned_fields(report: ScoreReport, expected_steps: list[AuditStep], predicted_steps: list[AuditStep]) -> None:
+    """Compare steps that share phase, system, resource, and operation.
+
+    This does not replace positional field accuracy. A missing step no longer
+    shifts later fields into false mismatches.
+    """
+    remaining: dict[tuple[str, str, str, str], list[AuditStep]] = {}
+    for step in predicted_steps:
+        remaining.setdefault((step.phase, step.system_id, step.resource_id, step.operation), []).append(step)
+    fields = ("phase", "system_id", "resource_id", "operation", "state", "evidence_id")
+    for step in expected_steps:
+        report.aligned_field_total += len(fields)
+        bucket = remaining.get((step.phase, step.system_id, step.resource_id, step.operation))
+        if not bucket:
+            continue
+        other = bucket.pop(0)
+        for name in fields:
+            if getattr(step, name) == getattr(other, name):
+                report.aligned_field_matches += 1
+
+
 def format_report(report: ScoreReport) -> str:
     lines = [
         f"cases={report.cases}",
         f"status_accuracy={report.status_accuracy:.4f} ({report.status_correct}/{report.cases})",
         f"row_accuracy={report.row_accuracy:.4f} ({report.exact_rows}/{report.cases})",
         f"field_accuracy={report.field_accuracy:.4f} ({report.field_matches}/{report.field_total})",
+        f"aligned_field_accuracy={report.aligned_field_accuracy:.4f} ({report.aligned_field_matches}/{report.aligned_field_total})",
         f"sequence_accuracy={report.sequence_accuracy:.4f} ({report.sequence_exact}/{report.cases})",
         f"operation_precision={report.operation_precision:.4f} ({report.operation_overlap}/{report.operation_predicted})",
         f"operation_recall={report.operation_recall:.4f} ({report.operation_overlap}/{report.operation_expected})",

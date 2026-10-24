@@ -155,3 +155,31 @@ Before submitting, confirm that:
 - `code.zip` includes your runnable code, `README.md`, `code/evaluation/evaluation_report.md`, and `code/evaluation/usage_report.md`;
 - `log.txt` follows the `AGENTS.md` turn format and is uploaded to the `chat_transcript` slot; and
 - no API keys, credentials, real personal data, or sensitive configuration values are included.
+
+---
+
+## Implemented auditor
+
+The solution is a deterministic Python auditor. `python3 code/main.py` and `python code/main.py` both load `dataset/`, audit all 518 requests, and write repository-root `output.csv`. The public-sample scorer uses the same `DeletionAuditor`. No API key is required. The standard library is enough; Python 3.11 was used on Windows.
+
+```bash
+python3 code/main.py
+python3 -m unittest code.tests.test_foundation code.tests.test_reasoning
+python3 -m code.evaluation.predict
+```
+
+Run those commands from the repository root, with `dataset/` beside `code/`. The root is discovered from the location of `code/main.py` and the `dataset` directory. No absolute machine path is compiled into the auditor.
+
+### Architecture
+
+Request text is classified before any record is considered. A non-deletion request returns `NOT_APPLICABLE` and `[]`. The request email is resolved through the current identity snapshot and the audit log. Resource ownership comes from identifiers on evidence, from a deletion-worker detail that literally says `Target resource:`, or from an earlier snapshot inside a later file. State and citations still require the evidence package to have been captured at or before `audit_at`. A later event can fill a resource only when nothing eligible exists and the case is already incomplete, and that verification cites no file.
+
+JSON, SQL, logs, PDFs, and text become one observation type. The eleven screenshots are represented by `code/ingestion/image_facts.py`. Policy comes from the 15 rows in `dataset/deletion_rules.csv`: delete, redact, anonymize, or retain, including tombstones, security logs, legal holds, flows, and backups.
+
+### Evaluation and limits
+
+On the 32 public samples the measured result is status 32/32, exact rows 17/32, positional fields 889/1158, sequence 17/32, precision 172/172, and recall 172/193, with zero extra operations. Details, three synthetic cases, and the production checks are in `code/evaluation/evaluation_report.md`. The dataset run calls no model; token counts and cost are zero in `code/evaluation/usage_report.md`.
+
+Twenty-one public operations remain unmatched because the resource has only null identifiers, the activity names no person, or the id is absent from the participant files. Those rows are not filled from the sample answer. Hidden labels for the 518 requests are not available, so production accuracy against them is not claimed.
+
+Two consecutive `python code/main.py` runs produced the same `output.csv` SHA-256: `945dc6236c87f29551f47a923de381f58c7991825b2f84bea09ca427adcffad5`. Interview notes are in `code/docs/ai_judge_preparation.md`.

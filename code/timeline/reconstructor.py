@@ -44,9 +44,16 @@ class TimelineReconstructor:
     def eligible(self, observations: list[Observation], audit_at: datetime) -> list[Observation]:
         return [row for row in observations if row.eligible_at(audit_at)]
 
-    def reconstruct(self, observations: list[Observation], audit_at: datetime) -> list[ResourceState]:
+    def reconstruct(
+        self,
+        observations: list[Observation],
+        audit_at: datetime,
+        *,
+        require_package: bool = True,
+    ) -> list[ResourceState]:
         grouped: dict[tuple[str, str, str, str], list[Observation]] = {}
-        for row in self.eligible(observations, audit_at):
+        rows = self.eligible(observations, audit_at) if require_package else observations
+        for row in rows:
             if row.is_claim or row.presence not in {"present", "absent"}:
                 continue
             if not row.resource_id:

@@ -91,4 +91,6 @@ The 28 missing public-sample steps, after that review:
 
 Every one of those 28 has `independently_established=false`. No class E gap remains: every compliant resource the planner can link already gets one verification step.
 
+Phase 5 tested using inner event time when the file package is later. That lowered exact-row accuracy from 15/32 to 12/32 and was reverted. The write-up is `exact_match_investigation.md`.
+
 `evidence_54` names four failover accounts and three primary accounts. It does not name `account_001` or `account_004`. `account_004` also has no activity row. `evidence_51` has an empty account collection and tombstones for two users. It does not name `account_4857`. `evidence_92` repeats that pattern for several accounts and analytics rows whose email, phone, hash, and customer reference are null, in a file that also contains other subjects. Later bundles sometimes repeat those resources with a subject key, and those bundles are captured after the case `audit_at`. Two security-log ids in the public answers do not appear in any participant file or activity. Those links stay unresolved.

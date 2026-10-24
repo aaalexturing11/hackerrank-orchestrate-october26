@@ -112,7 +112,12 @@ class Observation:
     shared_context: Optional[bool] = None
 
     def eligible_at(self, audit_at: datetime) -> bool:
-        """True when both the file capture and the inner observation are at or before audit_at."""
+        """True when both the file package and the inner observation are at or before audit_at.
+
+        A snapshot or log packaged after audit_at is not state and is not a citation.
+        Identity lineage may still read an earlier event inside that package.
+        A historical state is used only when the resource has no eligible observation.
+        """
         if self.captured_at is not None and self.captured_at > audit_at:
             return False
         if self.observed_at is not None and self.observed_at > audit_at:

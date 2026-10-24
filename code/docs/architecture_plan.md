@@ -238,3 +238,7 @@ The sample evaluator now reports operation precision and recall, and it prints e
 
 Trace keys propagate only inside one trace, and an explicit null is not a key. Empty collections and `snapshot_scope` rows are not closed-world absence. The public-sample score is unchanged because none of the 28 missing steps has a unique subject key in evidence that is eligible at `audit_at`. The class counts and the contradictions are in `policy_engine.md`.
 
+## 16. Phase 5 exact-match investigation
+
+`code/docs/exact_match_investigation.md` records the attempt to treat inner event time as eligibility even when the evidence file was packaged after `audit_at`. That run scored 30/32 status and 12/32 exact row, and it was reverted. File package time remains part of eligibility. Positional field accuracy is unchanged. An alignment diagnostic is printed beside it and does not replace it.
+

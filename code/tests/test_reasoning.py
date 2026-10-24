@@ -261,10 +261,254 @@ class PolicyTests(unittest.TestCase):
         decision = DeletionPlanner(_resolver(), [identified, anonymous], []).audit(_request())
         self.assertEqual([step.resource_id for step in decision.steps], ["account_10"])
 
+    def test_later_package_supplies_ownership_without_replacing_state(self) -> None:
+        early = _observation(
+            evidence_id="evidence_early",
+            system_id="account_service",
+            resource_id="account_10",
+            record_type="USER_PROFILE",
+            presence="absent",
+            identifiers=IdentifierBag(),
+            identifiers_exposed=False,
+            observed_at=datetime(2026, 9, 15, 11, 0, tzinfo=UTC),
+            captured_at=datetime(2026, 9, 15, 11, 0, tzinfo=UTC),
+        )
+        packaged_later = _observation(
+            evidence_id="evidence_late",
+            system_id="account_service",
+            resource_id="account_10",
+            record_type="USER_PROFILE",
+            presence="present",
+            observed_at=datetime(2026, 9, 9, 12, 0, tzinfo=UTC),
+            captured_at=datetime(2026, 9, 17, 12, 0, tzinfo=UTC),
+        )
+        exposed = _observation(
+            evidence_id="evidence_early",
+            system_id="support_platform",
+            resource_id="support_10",
+            record_type="SUPPORT_MESSAGE",
+            presence="present",
+            observed_at=datetime(2026, 9, 15, 10, 0, tzinfo=UTC),
+            captured_at=datetime(2026, 9, 15, 11, 0, tzinfo=UTC),
+        )
+        later_redaction = _observation(
+            evidence_id="evidence_late",
+            system_id="support_platform",
+            resource_id="support_10",
+            record_type="SUPPORT_MESSAGE",
+            presence="present",
+            identifiers=IdentifierBag(user_ids=("user_ada",)),
+            identifiers_exposed=False,
+            redacted=True,
+            observed_at=datetime(2026, 9, 15, 12, 0, tzinfo=UTC),
+            captured_at=datetime(2026, 9, 17, 12, 0, tzinfo=UTC),
+        )
+        decision = DeletionPlanner(
+            _resolver(),
+            [early, packaged_later, exposed, later_redaction],
+            [],
+        ).audit(_request())
+        by_resource = {step.resource_id: step for step in decision.steps if step.phase == "FINDING" or step.operation == "VERIFY_RECORD_ABSENT"}
+        self.assertEqual(by_resource["account_10"].operation, "VERIFY_RECORD_ABSENT")
+        self.assertEqual(by_resource["account_10"].evidence_id, "")
+        self.assertEqual(by_resource["support_10"].operation, "REPORT_EXPOSED_PII")
+        self.assertEqual(by_resource["support_10"].evidence_id, "evidence_early")
+        self.assertNotIn("evidence_late", {step.evidence_id for step in decision.steps})
+        complete = DeletionPlanner(_resolver(), [early, packaged_later], []).audit(_request())
+        cited = [step for step in complete.steps if step.resource_id == "account_10"]
+        self.assertEqual(complete.deletion_status, "COMPLETE")
+        self.assertEqual(cited[0].evidence_id, "evidence_early")
+
+    def test_competing_lineage_stays_unassigned(self) -> None:
+        early = _observation(
+            evidence_id="evidence_early",
+            system_id="account_service",
+            resource_id="account_10",
+            record_type="USER_PROFILE",
+            presence="absent",
+            identifiers=IdentifierBag(),
+            identifiers_exposed=False,
+        )
+        ours = _observation(
+            evidence_id="evidence_late",
+            system_id="account_service",
+            resource_id="account_10",
+            record_type="USER_PROFILE",
+            presence="present",
+            observed_at=datetime(2026, 9, 9, tzinfo=UTC),
+            captured_at=datetime(2026, 9, 17, tzinfo=UTC),
+        )
+        theirs = _observation(
+            evidence_id="evidence_other",
+            system_id="account_service",
+            resource_id="account_10",
+            record_type="USER_PROFILE",
+            presence="present",
+            identifiers=IdentifierBag(emails=("other@example.com",)),
+            observed_at=datetime(2026, 9, 9, tzinfo=UTC),
+            captured_at=datetime(2026, 9, 17, tzinfo=UTC),
+        )
+        decision = DeletionPlanner(_resolver(), [early, ours, theirs], []).audit(_request())
+        self.assertEqual(decision.steps, [])
+
+    def test_historical_event_fills_only_a_resource_without_eligible_state(self) -> None:
+        violation = _observation(
+            evidence_id="evidence_early",
+            system_id="support_platform",
+            resource_id="support_10",
+            record_type="SUPPORT_MESSAGE",
+        )
+        retained = _observation(
+            evidence_id="evidence_late",
+            system_id="security_service",
+            resource_id="audit_record_10",
+            record_type="SECURITY_AUDIT_LOG",
+            identifiers=IdentifierBag(user_ids=("user_ada",)),
+            identifiers_exposed=False,
+            observed_at=datetime(2026, 9, 15, 8, 0, tzinfo=UTC),
+            captured_at=datetime(2026, 9, 18, tzinfo=UTC),
+            retention_until=datetime(2027, 1, 1, tzinfo=UTC),
+        )
+        decision = DeletionPlanner(_resolver(), [violation, retained], []).audit(_request())
+        checks = [step for step in decision.steps if step.resource_id == "audit_record_10"]
+        self.assertEqual(decision.deletion_status, "INCOMPLETE")
+        self.assertEqual([step.operation for step in checks], ["VERIFY_RECORD_PRESENT"])
+        self.assertEqual(checks[0].evidence_id, "")
+        self.assertEqual(
+            [step.evidence_id for step in decision.steps if step.resource_id == "support_10" and step.phase == "FINDING"],
+            ["evidence_early"],
+        )
+
+    def test_later_package_does_not_expose_an_earlier_event(self) -> None:
+        event = _observation(
+            evidence_id="evidence_late_package",
+            system_id="security_service",
+            resource_id="audit_record_1",
+            record_type="SECURITY_AUDIT_LOG",
+            presence="present",
+            observed_at=datetime(2026, 9, 16, 8, 52, tzinfo=UTC),
+            captured_at=datetime(2026, 9, 18, 11, 55, tzinfo=UTC),
+            identifiers=IdentifierBag(user_ids=("user_ada",)),
+            identifiers_exposed=False,
+            retention_until=datetime(2031, 12, 31, tzinfo=UTC),
+        )
+        self.assertFalse(event.eligible_at(datetime(2026, 9, 16, 9, 0, tzinfo=UTC)))
+
     def test_resource_search_does_not_match_a_longer_id(self) -> None:
         payload = b'resource_id="account_41038"'
         self.assertFalse(resource_in_payload("account_410", payload))
         self.assertTrue(resource_in_payload("account_41038", payload))
+
+    def test_worker_row_without_a_named_target_is_not_in_scope(self) -> None:
+        from code.engine.planner import resource_scopes
+        from code.models import ActivityRecord
+
+        named = ActivityRecord(
+            "activity_named",
+            datetime(2026, 9, 2, 12, 5, tzinfo=UTC),
+            "DELETE_RECORD",
+            "deletion_worker",
+            "account_service",
+            "account_10",
+            "SUCCESS",
+            "Deletion worker reported the requested operation as completed. Target resource: account_10.",
+        )
+        unnamed = ActivityRecord(
+            "activity_unnamed",
+            datetime(2026, 9, 2, 12, 5, tzinfo=UTC),
+            "DELETE_RECORD",
+            "deletion_worker",
+            "account_service",
+            "account_99",
+            "SUCCESS",
+            "Deletion worker submitted primary profile account_99 to account_service.",
+        )
+        scopes = resource_scopes(_request(), [named, unnamed], [], _resolver().aliases_at("user_ada", AUDIT))
+        self.assertEqual([scope.resource_id for scope in scopes], ["account_10"])
+        self.assertEqual(scopes[0].workflow_source, "activity_named")
+        self.assertFalse(scopes[0].competing)
+
+    def test_present_failover_is_not_hidden_by_an_absent_primary(self) -> None:
+        primary = _observation(
+            system_id="account_service",
+            resource_id="account_10",
+            record_type="USER_PROFILE",
+            replica_role="primary",
+            presence="absent",
+            identifiers=IdentifierBag(),
+            identifiers_exposed=False,
+            observed_at=datetime(2026, 9, 14, tzinfo=UTC),
+        )
+        failover = _observation(
+            evidence_id="evidence_failover",
+            system_id="account_service",
+            resource_id="account_10",
+            record_type="USER_PROFILE",
+            replica_role="failover",
+            replica_name="eu-west",
+            presence="present",
+            observed_at=datetime(2026, 9, 12, tzinfo=UTC),
+        )
+        decision = DeletionPlanner(_resolver(), [primary, failover], []).audit(_request())
+        findings = [step for step in decision.steps if step.phase == "FINDING"]
+        self.assertEqual([step.operation for step in findings], ["REPORT_REMAINING_RECORD"])
+        self.assertEqual(findings[0].evidence_id, "evidence_failover")
+
+    def test_later_absence_on_the_same_replica_replaces_an_earlier_present(self) -> None:
+        present = _observation(
+            evidence_id="evidence_old",
+            system_id="account_service",
+            resource_id="account_10",
+            record_type="USER_PROFILE",
+            replica_role="primary",
+            presence="present",
+            observed_at=datetime(2026, 9, 10, tzinfo=UTC),
+        )
+        absent = _observation(
+            evidence_id="evidence_new",
+            system_id="account_service",
+            resource_id="account_10",
+            record_type="USER_PROFILE",
+            replica_role="primary",
+            presence="absent",
+            identifiers=IdentifierBag(emails=("ada@example.com",)),
+            identifiers_exposed=False,
+            observed_at=datetime(2026, 9, 14, tzinfo=UTC),
+        )
+        decision = DeletionPlanner(_resolver(), [present, absent], []).audit(_request())
+        self.assertEqual([step.operation for step in decision.steps], ["VERIFY_RECORD_ABSENT"])
+        self.assertEqual(decision.steps[0].evidence_id, "evidence_new")
+
+    def test_dataset_rule_actions_match_policy_decisions(self) -> None:
+        from code.ingestion.csv_loader import load_dataset
+
+        rules = load_dataset().rules
+        self.assertEqual(len(rules), 15)
+        retained_until = datetime(2027, 1, 1, tzinfo=UTC)
+        for rule in rules:
+            state = _state(
+                record_type=rule.data_category,
+                resource_id=rule.rule_id,
+                presence="present",
+                identifiers_exposed=rule.required_action in {"REDACT", "ANONYMIZE", "DELETE"},
+                anonymized=False,
+                redacted=False if rule.required_action == "REDACT" else None,
+                retention_until=retained_until if rule.data_category in {"SECURITY_AUDIT_LOG", "LEGAL_HOLD_RECORD"} else None,
+                restore_blocked=True if rule.data_category == "BACKUP_ARCHIVE" else None,
+            )
+            treatment = decide(state, AUDIT)
+            self.assertIsNotNone(treatment, rule.rule_id)
+            assert treatment is not None
+            self.assertEqual(treatment.action, rule.required_action, rule.rule_id)
+        expired = decide(
+            _state(
+                record_type="SECURITY_AUDIT_LOG",
+                retention_until=datetime(2026, 1, 1, tzinfo=UTC),
+                identifiers_exposed=False,
+            ),
+            AUDIT,
+        )
+        self.assertIsNone(expired)
 
 
 if __name__ == "__main__":
